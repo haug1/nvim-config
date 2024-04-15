@@ -26,12 +26,11 @@ return { -- Autocompletion
     "hrsh7th/cmp-nvim-lsp",
     "hrsh7th/cmp-path",
   },
-  config = function()
+  opts = function()
     local cmp = require("cmp")
+    local defaults = require("cmp.config.default")()
     local luasnip = require("luasnip")
-    luasnip.config.setup({})
-
-    cmp.setup({
+    return {
       snippet = {
         expand = function(args)
           luasnip.lsp_expand(args.body)
@@ -61,6 +60,13 @@ return { -- Autocompletion
         { name = "luasnip" },
         { name = "path" },
       },
-    })
+      sorting = defaults.sorting,
+    }
+  end,
+  config = function(_, opts)
+    local cmp = require("cmp")
+    local luasnip = require("luasnip")
+    luasnip.config.setup({})
+    cmp.setup(opts)
   end,
 }

@@ -13,6 +13,7 @@ return {
     ]]
 
       logo = string.rep("\n", 8) .. logo .. "\n\n"
+      local telescope = require("telescope.builtin")
 
       local opts = {
         theme = "doom",
@@ -43,7 +44,10 @@ return {
               key = "r",
             },
             {
-              action = "lua require('telescope.builtin').find_files({cwd='~/.config/nvim-wip'})",
+              action = function()
+                vim.cmd.cd(vim.fn.stdpath("config"))
+                telescope.find_files()
+              end,
               desc = " Config Files",
               icon = " ",
               key = "c",

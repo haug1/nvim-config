@@ -8,6 +8,7 @@ end
 
 require("haug1.core.options")
 require("haug1.core.keymaps")
+require("haug1.core.autocmds")
 require("haug1.lazy")
 require("lazy").setup({
   "nvim-lua/plenary.nvim",

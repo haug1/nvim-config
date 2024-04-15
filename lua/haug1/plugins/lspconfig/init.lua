@@ -2,9 +2,7 @@ return {
   -- mason_lspconfig.setup({
   --   -- list of servers for mason to install
   --   ensure_installed = {
-  --     "gopls",
   --     "terraformls",
-  --     "kotlin_language_server",
   --     "emmet_ls",
   --     "ocamllsp",
   --   },
@@ -13,8 +11,6 @@ return {
   -- mason_tool_installer.setup({
   --   ensure_installed = {
   --     "tflint",
-  --     "gofumpt",
-  --     "goimports",
   --     "shfmt",
   --   },
   -- })
@@ -116,10 +112,10 @@ return {
         end,
       })
 
-      local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities = vim.tbl_deep_extend(
+      local capabilities = vim.tbl_deep_extend(
         "force",
-        capabilities,
+        {},
+        vim.lsp.protocol.make_client_capabilities(),
         require("cmp_nvim_lsp").default_capabilities()
       )
 
@@ -132,6 +128,13 @@ return {
             capabilities,
             server.capabilities or {}
           )
+
+          -- expose possibility to run my own custom setup function from the opts
+          if type(server.my_setup_func) == "function" then
+            server.my_setup_func()
+            server.my_setup_func = nil
+          end
+
           require("lspconfig")[server_name].setup(server)
         end,
       })

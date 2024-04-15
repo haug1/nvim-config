@@ -168,12 +168,17 @@ vim.keymap.set(
   { noremap = true, desc = "Next terminal" }
 )
 vim.keymap.set("t", "<C-,>", cycle_back, { desc = "Previous terminal" })
-vim.keymap.set("n", "<C-\\>", open_lazygit, { desc = "Toggle lazygit" })
+vim.keymap.set(
+  "n",
+  "<C-\\>",
+  open_lazygit,
+  { desc = "Toggle lazygit", noremap = true }
+)
 vim.keymap.set(
   "t",
   "<C-\\>",
   close_lazygit,
-  { desc = "Close lazygit (if exists)" }
+  { desc = "Close lazygit (if exists)", noremap = true }
 )
 vim.keymap.set("t", "<C-S-j>", toggle_horizontal, { desc = "Resize" })
 vim.keymap.set("t", "<C-S-h>", toggle_vertical, { desc = "Resize" })

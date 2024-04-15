@@ -3,6 +3,8 @@
 
 local set = vim.keymap.set
 
+set("n", "<Esc>", "<cmd>nohlsearch<CR>")
+
 -- Cycle buffers
 set("n", "<A-tab>", "<cmd>bnext<cr>", { desc = "Next buffer" })
 set("n", "<C-tab>", "<cmd>bprevious<cr>", { desc = "Previous buffer" })

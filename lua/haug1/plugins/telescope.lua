@@ -18,10 +18,18 @@ return {
       telescope.setup({
         defaults = {
           path_display = { "smart" },
+          file_ignore_patterns = {
+            "node_modules/.*",
+            "yarn.lock",
+            "package%-lock.json",
+            "lazy%-lock.json",
+            "target/.*",
+            ".git/.*",
+          },
           mappings = {
             i = {
-              ["<C-j>"] = move_next,
-              ["<C-k>"] = move_prev,
+              ["<C-k>"] = move_next,
+              ["<C-j>"] = move_prev,
             },
           },
         },
@@ -31,9 +39,14 @@ return {
             hidden = true,
           },
         },
+        extensions = {
+          file_browser = {},
+        },
       })
 
       telescope.load_extension("fzf")
+
+      local haug1_builtins = require("haug1.config.telescope")
 
       local set = vim.keymap.set
       set(
@@ -67,13 +80,24 @@ return {
         builtin.oldfiles,
         { desc = "Recent files (Telescope)" }
       )
-      set("n", "<leader>sk", builtin.keymaps, { desc = "Keymaps (Telescope)" })
       set(
         "n",
-        "<leader>sc",
-        "<cmd>lua require('telescope.builtin').find_files({cwd='~/.config/nvim-wip'})<cr>",
-        { desc = "Config files (Telescope)" }
+        "<leader>sF",
+        haug1_builtins.repos_file,
+        { desc = "Browse files in selected repository (Telescope)" }
       )
+      set(
+        "n",
+        "<leader>sR",
+        haug1_builtins.repos_file,
+        { desc = "Browse files in selected repository (Telescope)" }
+      )
+      set("n", "<leader>sk", builtin.keymaps, { desc = "Keymaps (Telescope)" })
+      set("n", "<leader>sc", function()
+        require("telescope.builtin").find_files({
+          cwd = vim.fn.stdpath("config"),
+        })
+      end, { desc = "Config files (Telescope)" })
     end,
   },
 }
