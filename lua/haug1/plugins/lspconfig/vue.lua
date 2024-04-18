@@ -1,3 +1,5 @@
+-- NOTE: FUCK VUE LSP WE PINNED AT 1.8
+
 local function is_vue_project()
   local current_path = vim.fn.expand("%:p:h")
   local util = require("lspconfig.util")
@@ -13,7 +15,7 @@ local function setupVolarNew(opts)
 
   -- disable tsserver because volar runs in "takeover" mode,
   -- which means it handles all typescript stuff
-  opts.servers.tsserver = { enabled = false }
+  -- opts.servers.tsserver = { enabled = false }
 
   opts.servers.volar = {
     filetypes = {
@@ -22,12 +24,37 @@ local function setupVolarNew(opts)
       "javascriptreact",
       "typescriptreact",
       "vue",
+      "json",
     },
     init_options = {
       vue = {
         hybridMode = false,
       },
     },
+  }
+end
+
+-- not working
+-- requires volar > 2.0
+local function setupVolarIdeal(opts)
+  local get_package = require("mason-registry").get_package
+  opts.servers.volar = {}
+  opts.servers.tsserver = {
+    init_options = {
+      plugins = {
+        {
+          name = "@vue/typescript-plugin",
+          location = get_package("vue-language-server"):get_install_path()
+            .. "/node_modules/@vue/language-server/node_modules/@vue/typescript-plugin",
+          languages = { "javascript", "typescript", "vue" },
+        },
+      },
+      tsserver = {
+        path = get_package("typescript-language-server"):get_install_path()
+          .. "/node_modules/typescript/lib",
+      },
+    },
+    filetypes = { "javascript", "typescript", "vue" },
   }
 end
 
