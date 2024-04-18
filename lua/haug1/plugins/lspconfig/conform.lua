@@ -1,3 +1,4 @@
+-- TODO: command/keymap to toggle auto-formatting
 return { -- Autoformat
   "stevearc/conform.nvim",
   lazy = false,
