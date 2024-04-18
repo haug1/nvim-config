@@ -8,63 +8,11 @@ local function is_vue_project()
   return vim.fn.isdirectory(vue_path) == 1
 end
 
--- not working
--- requires volar > 2.0
-local function setupVolarNew(opts)
-  opts.servers = opts.servers or {}
-
-  -- disable tsserver because volar runs in "takeover" mode,
-  -- which means it handles all typescript stuff
-  -- opts.servers.tsserver = { enabled = false }
-
-  opts.servers.volar = {
-    filetypes = {
-      "typescript",
-      "javascript",
-      "javascriptreact",
-      "typescriptreact",
-      "vue",
-      "json",
-    },
-    init_options = {
-      vue = {
-        hybridMode = false,
-      },
-    },
-  }
-end
-
--- not working
--- requires volar > 2.0
-local function setupVolarIdeal(opts)
-  local get_package = require("mason-registry").get_package
-  opts.servers.volar = {}
-  opts.servers.tsserver = {
-    init_options = {
-      plugins = {
-        {
-          name = "@vue/typescript-plugin",
-          location = get_package("vue-language-server"):get_install_path()
-            .. "/node_modules/@vue/language-server/node_modules/@vue/typescript-plugin",
-          languages = { "javascript", "typescript", "vue" },
-        },
-      },
-      tsserver = {
-        path = get_package("typescript-language-server"):get_install_path()
-          .. "/node_modules/typescript/lib",
-      },
-    },
-    filetypes = { "javascript", "typescript", "vue" },
-  }
-end
-
 -- working
 -- requires volar < 2.0
-local function setupVolarOld(opts)
+local function setup_volar_old_takeover(opts)
   opts.servers = opts.servers or {}
-
   opts.servers.tsserver = { enabled = false }
-
   opts.servers.volar = {
     filetypes = {
       "vue",
@@ -78,6 +26,52 @@ local function setupVolarOld(opts)
     },
   }
 end
+
+-- -- not working
+-- -- requires volar > 2.0
+-- local function setup_volar_new_hybrid(opts)
+--   local get_package = require("mason-registry").get_package
+--   opts.servers.volar = {}
+--   opts.servers.tsserver = {
+--     init_options = {
+--       plugins = {
+--         {
+--           name = "@vue/typescript-plugin",
+--           location = get_package("vue-language-server"):get_install_path()
+--             .. "/node_modules/@vue/language-server/node_modules/@vue/typescript-plugin",
+--           languages = { "javascript", "typescript", "vue" },
+--         },
+--       },
+--       tsserver = {
+--         path = get_package("typescript-language-server"):get_install_path()
+--           .. "/node_modules/typescript/lib",
+--       },
+--     },
+--     filetypes = { "javascript", "typescript", "vue" },
+--   }
+-- end
+
+-- -- not working
+-- -- requires volar > 2.0
+-- local function setup_volar_new_takeover(opts)
+--   opts.servers = opts.servers or {}
+--   opts.servers.tsserver = { enabled = false }
+--   opts.servers.volar = {
+--     filetypes = {
+--       "typescript",
+--       "javascript",
+--       "javascriptreact",
+--       "typescriptreact",
+--       "vue",
+--       "json",
+--     },
+--     init_options = {
+--       vue = {
+--         hybridMode = false,
+--       },
+--     },
+--   }
+-- end
 
 return {
   {
@@ -112,7 +106,7 @@ return {
     "neovim/nvim-lspconfig",
     opts = function(_, opts)
       if is_vue_project() then -- if not vue project, skip config
-        setupVolarOld(opts)
+        setup_volar_old_takeover(opts)
       end
     end,
   },

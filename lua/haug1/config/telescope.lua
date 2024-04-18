@@ -15,6 +15,8 @@ function M.dirjump_grep(dir)
   M.dirjump(dir, builtin.live_grep)
 end
 
+--- Lists the directories of the specified location
+--- and runs telescope_fn(i.e. find_files) in that directory.
 ---@param telescope_fn function
 function M.dirjump(dir, telescope_fn)
   pickers
