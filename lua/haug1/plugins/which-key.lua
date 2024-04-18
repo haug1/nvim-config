@@ -11,7 +11,7 @@ return {
       -- or leave it empty to use the default settings
       -- refer to the configuration section below
       --
-      -- TODO: Document groups
+      -- TODO: Document groups (or remove which-key... hmmm)
     },
   },
 }

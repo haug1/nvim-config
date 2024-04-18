@@ -21,19 +21,25 @@ function M.dirjump(dir, telescope_fn)
     .new({}, {
       finder = finders.new_oneshot_job(
         { "fd", "--type", "directory", "--prune" },
-        {
-          cwd = dir,
-        }
+        { cwd = dir }
       ),
       sorter = conf.generic_sorter({}),
-      attach_mappings = function(prompt_bufnr)
+      attach_mappings = function(dir_prompt_bufnr)
         actions.select_default:replace(function()
-          actions.close(prompt_bufnr)
-          local selection = action_state.get_selected_entry()
+          actions.close(dir_prompt_bufnr)
+          local dir_selection = action_state.get_selected_entry()
           telescope_fn({
-            cwd = dir .. "/" .. selection.value,
+            cwd = dir .. "/" .. dir_selection.value,
+            attach_mappings = function(file_prompt_bufnr)
+              actions.select_default:replace(function()
+                actions.close(file_prompt_bufnr)
+                local file_selection = action_state.get_selected_entry()
+                vim.cmd.cd(dir .. "/" .. dir_selection.value)
+                vim.cmd.edit(file_selection.value)
+              end)
+              return true
+            end,
           })
-          -- TODO: Set cwd to new repo on file selected
         end)
         return true
       end,
