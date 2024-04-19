@@ -2,6 +2,7 @@ local builtin = require("telescope.builtin")
 local pickers = require("telescope.pickers")
 local finders = require("telescope.finders")
 local actions = require("telescope.actions")
+local action_set = require("telescope.actions.set")
 local action_state = require("telescope.actions.state")
 local conf = require("telescope.config").values
 
@@ -34,10 +35,9 @@ function M.dirjump(dir, telescope_fn)
             cwd = dir .. "/" .. dir_selection.value,
             attach_mappings = function(file_prompt_bufnr)
               actions.select_default:replace(function()
-                actions.close(file_prompt_bufnr)
-                local file_selection = action_state.get_selected_entry()
                 vim.cmd.cd(dir .. "/" .. dir_selection.value)
-                vim.cmd.edit(file_selection.value)
+                action_set.edit(file_prompt_bufnr, "edit")
+                vim.cmd([[normal! zz]])
               end)
               return true
             end,
