@@ -76,9 +76,7 @@ function M.on_create_terminal(terminal)
   vim.api.nvim_create_autocmd("BufEnter", {
     buffer = terminal.bufnr,
     callback = function()
-      print("TermOpen")
       vim.cmd.startinsert()
-      -- vim.defer_fn(vim.cmd.startinsert, 0)
     end,
   })
   vim.api.nvim_create_autocmd("TermClose", {
