@@ -1,5 +1,7 @@
--- configures toggleterm and extends it with terminal cycling
+-- implements cycling between terminals and other QoL features for terminals
 -- adds terminal keymaps
+-- based on https://github.com/akinsho/toggleterm.nvim
+
 local util = require("haug1.core.util")
 local Terminal = require("toggleterm.terminal").Terminal
 
@@ -24,6 +26,19 @@ function M.default_keymaps()
 
   vim.keymap.set("t", "<S-space>", "<space>") -- otherwise it prints ;2u, which i never need, even when i misclick
   vim.keymap.set("t", "<S-backspace>", "<backspace>") -- prints 7;2u
+
+  -- activate tmux navigation in terminal mode
+  local map = function(key, cmd, nav)
+    vim.keymap.set({ "t" }, key, function()
+      vim.cmd.stopinsert()
+      vim.cmd(cmd)
+    end, { desc = "TmuxNavigate " .. nav, noremap = true })
+  end
+  map("<c-h>", "TmuxNavigateLeft", "Left")
+  map("<c-j>", "TmuxNavigateDown", "Down")
+  map("<c-l>", "TmuxNavigateRight", "Right")
+  map("<c-k>", "TmuxNavigateUp", "Up")
+  map("<c-q>", "TmuxNavigatePrevious", "Previous")
   -- stylua: ignore end
 end
 
@@ -58,6 +73,14 @@ end
 function M.on_create_terminal(terminal)
   M.on_create_keymaps(terminal)
   table.insert(terminals, terminal.id)
+  vim.api.nvim_create_autocmd("BufEnter", {
+    buffer = terminal.bufnr,
+    callback = function()
+      print("TermOpen")
+      vim.cmd.startinsert()
+      -- vim.defer_fn(vim.cmd.startinsert, 0)
+    end,
+  })
   vim.api.nvim_create_autocmd("TermClose", {
     once = true,
     buffer = terminal.bufnr,
