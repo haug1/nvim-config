@@ -1,130 +1,123 @@
 -- configures toggleterm and extends it with terminal cycling
 -- adds terminal keymaps
-
-require("toggleterm").setup({
-  persist_mode = false,
-  start_in_insert = false,
-  on_open = function()
-    -- workaround: always insert mode when terminal opened
-    vim.fn.timer_start(1, function()
-      vim.cmd("startinsert!")
-    end)
-  end,
-  size = function(term)
-    if term.direction == "horizontal" then
-      return math.floor(vim.o.lines * 0.3)
-    elseif term.direction == "vertical" then
-      return math.floor(vim.o.columns * 0.4)
-    end
-  end,
-  float_opts = {
-    width = function()
-      return math.floor(vim.o.columns * 0.9)
-    end,
-    height = function()
-      return math.floor(vim.o.lines * 0.9)
-    end,
-  },
-})
-
-local Util = require("haug1.core.util")
+local util = require("haug1.core.util")
 local Terminal = require("toggleterm.terminal").Terminal
 
+local terminal_id_counter = 0
+local selected_terminal = terminal_id_counter
+local terminals = {}
+local remember_direction = "float"
 local lazygit_terminal = nil
-local function open_lazygit()
+
+local M = {}
+
+function M.default_keymaps()
+  -- stylua: ignore start
+  vim.keymap.set({ "n", "i", "v", "t" }, "<C-t>", M.toggle, { noremap = true, desc = "Show terminal" })
+  vim.keymap.set("t", "<C-n>", M.new, { desc = "New terminal", noremap = true })
+  vim.keymap.set("t", "<C-.>", M.cycle_forward, { noremap = true, desc = "Next terminal" })
+  vim.keymap.set("t", "<C-,>", M.cycle_back, { desc = "Previous terminal" })
+  vim.keymap.set("n", "<C-\\>", M.open_lazygit, { desc = "Toggle lazygit", noremap = true })
+  vim.keymap.set("t", "<C-\\>", M.close_lazygit, { desc = "Close lazygit (if exists)", noremap = true })
+  vim.keymap.set("t", "<C-S-j>", M.toggle_horizontal, { desc = "Resize" })
+  vim.keymap.set("t", "<C-S-h>", M.toggle_vertical, { desc = "Resize" })
+
+  vim.keymap.set("t", "<S-space>", "<space>") -- otherwise it prints ;2u, which i never need, even when i misclick
+  vim.keymap.set("t", "<S-backspace>", "<backspace>") -- prints 7;2u
+  -- stylua: ignore end
+end
+
+function M.on_create_keymaps(terminal)
+  -- stylua: ignore start
+  vim.keymap.set("t", "<esc><esc>", vim.cmd.stopinsert, { desc = "Stop insert mode", buffer = terminal.bufnr })
+
+  -- disable buffer cycling in terminal
+  vim.keymap.set({"n","i","v","x"}, "<A-tab>", "<A-tab>", {noremap = true, buffer = terminal.bufnr})
+  vim.keymap.set({"n","i","v","x"}, "<S-tab>", "<S-tab>", {noremap = true, buffer = terminal.bufnr})
+  -- stylua: ignore end
+end
+
+function M.open_lazygit()
   lazygit_terminal = Terminal:new({
     cmd = "lazygit",
   })
   lazygit_terminal:open(nil, "float")
 end
 
-local function close_lazygit()
+function M.close_lazygit()
   if lazygit_terminal ~= nil then
     lazygit_terminal:shutdown()
     lazygit_terminal = nil
   end
 end
 
----@type number
-local terminal_id_counter = 0
-
----@type number
-local selected_terminal = terminal_id_counter
-
----@type number[]
-local terminals = {}
-
-local remember_direction = "float"
-
-local function index_of_terminal(terminal_id)
-  return Util.index_of(terminals, terminal_id)
+function M.print_active()
+  print("Terminal #" .. util.index_of(terminals, selected_terminal))
 end
 
-local function print_active()
-  print("Terminal #" .. index_of_terminal(selected_terminal))
+function M.on_create_terminal(terminal)
+  M.on_create_keymaps(terminal)
+  table.insert(terminals, terminal.id)
+  vim.api.nvim_create_autocmd("TermClose", {
+    once = true,
+    buffer = terminal.bufnr,
+    callback = function()
+      local current_index = util.index_of(terminals, terminal.id)
+      if selected_terminal == terminal.id then
+        local new_index = util.previous_index(current_index, #terminals)
+        selected_terminal = terminals[new_index]
+      end
+      table.remove(terminals, current_index)
+      print("Disposed terminal, " .. #terminals .. " still open.")
+    end,
+  })
 end
 
-local function upsert_terminal(number)
+function M.upsert_terminal(number)
   local terminal = Terminal:new({ id = number })
-  terminal:open(nil, remember_direction)
-  local is_new = not index_of_terminal(terminal.id)
-  if is_new then
-    vim.keymap.set(
-      "t",
-      "<esc><esc>",
-      vim.cmd.stopinsert,
-      { desc = "Stop insert mode", buffer = terminal.bufnr }
-    )
-    table.insert(terminals, terminal.id)
-    vim.api.nvim_create_autocmd("TermClose", {
-      once = true,
-      buffer = terminal.bufnr,
-      callback = function()
-        local current_index = index_of_terminal(terminal.id)
-        if selected_terminal == terminal.id then
-          local new_index = Util.previous_index(current_index, #terminals)
-          selected_terminal = terminals[new_index]
-        end
-        table.remove(terminals, current_index)
-        print("Disposed terminal, " .. #terminals .. " still open.")
-      end,
-    })
+  if terminal:is_open() then
+    terminal:close()
+  else
+    terminal:open(nil, remember_direction)
+    if not util.index_of(terminals, terminal.id) then
+      M.on_create_terminal(terminal)
+    end
+    selected_terminal = terminal.id
+    M.print_active()
   end
-  selected_terminal = terminal.id
-  print_active()
   return terminal
 end
 
-local function new()
+function M.new()
   vim.cmd.close()
   local terminal_id = terminal_id_counter + 1
   terminal_id_counter = terminal_id
-  upsert_terminal(terminal_id)
+  M.upsert_terminal(terminal_id)
 end
 
-local function toggle()
-  upsert_terminal(selected_terminal)
+function M.toggle()
+  M.upsert_terminal(selected_terminal)
 end
 
-local function cycle(back)
+function M.cycle(back)
   if #terminals > 1 then
-    local find_index = back and Util.previous_index or Util.next_index
+    local find_index = back and util.previous_index or util.next_index
     vim.cmd.close()
-    local current_index = index_of_terminal(selected_terminal)
+    local current_index = util.index_of(terminals, selected_terminal)
     selected_terminal = terminals[find_index(current_index, #terminals)]
-    toggle()
+    M.toggle()
   end
 end
 
-local function cycle_forward()
-  cycle(false)
+function M.cycle_forward()
+  M.cycle(false)
 end
 
-local function cycle_back()
-  cycle(true)
+function M.cycle_back()
+  M.cycle(true)
 end
 
-local function resize(direction)
+function M.resize(direction)
   local terminal = Terminal:new({ id = selected_terminal })
   local is_current_direction = direction == terminal.direction
   vim.cmd.close()
@@ -136,49 +129,12 @@ local function resize(direction)
   terminal:toggle(nil, remember_direction)
 end
 
-local function toggle_vertical()
-  resize("vertical")
+function M.toggle_vertical()
+  M.resize("vertical")
 end
 
-local function toggle_horizontal()
-  resize("horizontal")
+function M.toggle_horizontal()
+  M.resize("horizontal")
 end
 
--- dont print stuff to terminal when accidentally holding shift
-vim.keymap.set("t", "<S-space>", "<space>") -- prints ;2u
-vim.keymap.set("t", "<S-backspace>", "<backspace>") -- prints 7;2u
-
-vim.keymap.set(
-  { "n", "i", "v" },
-  "<C-t>",
-  toggle,
-  { noremap = true, desc = "Show terminal" }
-)
-vim.keymap.set(
-  "t",
-  "<C-t>",
-  vim.cmd.close,
-  { desc = "Hide Terminal", noremap = true }
-)
-vim.keymap.set("t", "<C-n>", new, { desc = "New terminal", noremap = true })
-vim.keymap.set(
-  "t",
-  "<C-.>",
-  cycle_forward,
-  { noremap = true, desc = "Next terminal" }
-)
-vim.keymap.set("t", "<C-,>", cycle_back, { desc = "Previous terminal" })
-vim.keymap.set(
-  "n",
-  "<C-\\>",
-  open_lazygit,
-  { desc = "Toggle lazygit", noremap = true }
-)
-vim.keymap.set(
-  "t",
-  "<C-\\>",
-  close_lazygit,
-  { desc = "Close lazygit (if exists)", noremap = true }
-)
-vim.keymap.set("t", "<C-S-j>", toggle_horizontal, { desc = "Resize" })
-vim.keymap.set("t", "<C-S-h>", toggle_vertical, { desc = "Resize" })
+return M

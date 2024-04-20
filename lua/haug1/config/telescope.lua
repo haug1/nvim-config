@@ -35,8 +35,10 @@ function M.dirjump(dir, telescope_fn)
             cwd = dir .. "/" .. dir_selection.value,
             attach_mappings = function(file_prompt_bufnr)
               actions.select_default:replace(function()
+                -- set selected directory as new directory
                 vim.cmd.cd(dir .. "/" .. dir_selection.value)
                 action_set.edit(file_prompt_bufnr, "edit")
+                -- center on search result, i.e. relevant in case of live_grep
                 vim.cmd([[normal! zz]])
               end)
               return true

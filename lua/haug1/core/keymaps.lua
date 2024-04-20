@@ -5,10 +5,6 @@ local set = vim.keymap.set
 
 set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 
--- Cycle buffers
-set("n", "<A-tab>", "<cmd>bnext<cr>", { desc = "Next buffer" })
-set("n", "<C-tab>", "<cmd>bprevious<cr>", { desc = "Previous buffer" })
-
 -- Navigate back/forward
 set(
   { "n", "i", "v" },
@@ -83,13 +79,13 @@ set("n", "<leader>td", "<cmd>tabclose<CR>", { desc = "Close current tab" }) -- c
 set("n", "<leader>tn", "<cmd>tabn<CR>", { desc = "Go to next tab" }) --  go to next tab
 set("n", "<leader>tp", "<cmd>tabp<CR>", { desc = "Go to previous tab" }) --  go to previous tab
 set(
-  { "n", "t", "i", "v", "x" },
+  { "n", "i", "v", "x" },
   "<A-tab>",
   "<cmd>bnext<CR>",
   { desc = "Go to next tab" }
 ) --  go to next tab
 set(
-  { "n", "t", "i", "v", "x" },
+  { "n", "i", "v", "x" },
   "<S-tab>",
   "<cmd>bprevious<CR>",
   { desc = "Go to previous tab" }
