@@ -5,6 +5,7 @@ local actions = require("telescope.actions")
 local action_set = require("telescope.actions.set")
 local action_state = require("telescope.actions.state")
 local conf = require("telescope.config").values
+local util = require("haug1.core.util")
 
 local repos_dir = vim.fn.expand("$HOME/repos")
 local config_dir = vim.fn.expand("$HOME/.config")
@@ -23,12 +24,30 @@ function M.repos_files()
   M.dirjump_file(repos_dir)
 end
 
+function M.repos_grep_string()
+  M.dirjump_grep_string(repos_dir)
+end
+
 function M.dirjump_file(dir)
   M.dirjump(dir, builtin.find_files)
 end
 
 function M.dirjump_grep(dir)
   M.dirjump(dir, builtin.live_grep)
+end
+
+function M.grep_string(opts)
+  local selected_text = util.get_visual_selection()
+  local default_opts = selected_text and { search = selected_text } or {}
+  return builtin.grep_string(vim.tbl_extend("keep", default_opts, opts or {}))
+end
+
+function M.dirjump_grep_string(dir)
+  local selected_text = util.get_visual_selection()
+  local default_opts = selected_text and { search = selected_text } or {}
+  M.dirjump(dir, function(opts)
+    return builtin.grep_string(vim.tbl_extend("keep", default_opts, opts))
+  end)
 end
 
 --- Lists the directories of the specified location

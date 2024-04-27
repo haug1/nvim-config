@@ -58,8 +58,10 @@ return {
 
       local haug1_builtins = require("haug1.config.telescope")
       set("n", "<leader>sc", haug1_builtins.config_files, { desc = "Config files (Telescope)" })
+      set({ "n", "v" }, "<leader>ss", haug1_builtins.grep_string, { desc = "Grep selection or hovered word (Telescope)" })
       set("n", "<leader>sR", haug1_builtins.repos_grep, { desc = "Live grep in selected repository (Telescope)" })
       set("n", "<leader>sF", haug1_builtins.repos_files, { desc = "Browse files in selected repository (Telescope)" })
+      set({ "n", "v" }, "<leader>sS", haug1_builtins.repos_grep_string, { desc = "Grep selection in selected repository (Telescope)" })
       -- stylua: ignore end
     end,
   },
