@@ -6,7 +6,13 @@ local action_set = require("telescope.actions.set")
 local action_state = require("telescope.actions.state")
 local conf = require("telescope.config").values
 
+local config_dir = vim.fn.expand("$HOME/.config")
+
 local M = {}
+
+function M.config_files()
+  builtin.find_files({ cwd = config_dir })
+end
 
 function M.dirjump_file(dir)
   M.dirjump(dir, builtin.find_files)
