@@ -47,53 +47,20 @@ return {
       telescope.load_extension("fzf")
 
       local set = vim.keymap.set
-      set(
-        "n",
-        "<leader><leader>",
-        builtin.find_files,
-        { desc = "Find files (Telescope)" }
-      )
-      set(
-        "n",
-        "<leader>sf",
-        builtin.find_files,
-        { desc = "Find files (Telescope)" }
-      )
-      set(
-        "n",
-        "<leader>sg",
-        builtin.live_grep,
-        { desc = "Live grep (Telescope)" }
-      )
+      -- stylua: ignore start
+      set("n", "<leader><leader>", builtin.find_files, { desc = "Find files (Telescope)" })
+      set("n", "<leader>sf", builtin.find_files, { desc = "Find files (Telescope)" })
+      set("n", "<leader>sg", builtin.live_grep, { desc = "Live grep (Telescope)" })
       set("n", "<leader>sb", builtin.buffers, { desc = "Buffers (Telescope)" })
-      set(
-        "n",
-        "<leader>sh",
-        builtin.help_tags,
-        { desc = "Help tags (Telescope)" }
-      )
-      set(
-        "n",
-        "<leader>sr",
-        builtin.oldfiles,
-        { desc = "Recent files (Telescope)" }
-      )
-      set("n", "<leader>sk", builtin.keymaps, { desc = "Keymaps (Telescope)" })
-      set("n", "<leader>sc", function()
-        require("telescope.builtin").find_files({
-          cwd = vim.fn.stdpath("config"),
-        })
-      end, { desc = "Config files (Telescope)" })
+      set("n", "<leader>sh", builtin.help_tags, { desc = "Help tags (Telescope)" })
+      set("n", "<leader>sr", builtin.oldfiles, { desc = "Recent files (Telescope)" })
+      set({ "n", "v" }, "<leader>sk", builtin.keymaps, { desc = "Keymaps (Telescope)" })
 
-      -- quickly jump between projects
       local haug1_builtins = require("haug1.config.telescope")
-      local repo_dir = "/home/main/repos"
-      set("n", "<leader>sF", function()
-        haug1_builtins.dirjump_file(repo_dir)
-      end, { desc = "Browse files in selected repository (Telescope)" })
-      set("n", "<leader>sR", function()
-        haug1_builtins.dirjump_grep(repo_dir)
-      end, { desc = "Browse files in selected repository (Telescope)" })
+      set("n", "<leader>sc", haug1_builtins.config_files, { desc = "Config files (Telescope)" })
+      set("n", "<leader>sR", haug1_builtins.repos_grep, { desc = "Live grep in selected repository (Telescope)" })
+      set("n", "<leader>sF", haug1_builtins.repos_files, { desc = "Browse files in selected repository (Telescope)" })
+      -- stylua: ignore end
     end,
   },
 }
