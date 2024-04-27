@@ -99,3 +99,7 @@ set(
 
 set("v", "<tab>", ">", { desc = "Indent" })
 set("v", "<S-tab>", "<", { desc = "Remove indent" })
+set({ "i", "t" }, "<A-h>", "<Left>", { desc = "Arrow left", remap = false })
+set({ "i", "t" }, "<A-j>", "<Down>", { desc = "Arrow down", remap = false })
+set({ "i", "t" }, "<A-k>", "<Up>", { desc = "Arrow up", remap = false })
+set({ "i", "t" }, "<A-l>", "<Right>", { desc = "Arrow right", remap = false })
