@@ -53,25 +53,25 @@ end
 
 -- -- not working
 -- -- requires volar > 2.0
--- local function setup_volar_new_takeover(opts)
---   opts.servers = opts.servers or {}
---   opts.servers.tsserver = { enabled = false }
---   opts.servers.volar = {
---     filetypes = {
---       "typescript",
---       "javascript",
---       "javascriptreact",
---       "typescriptreact",
---       "vue",
---       "json",
---     },
---     init_options = {
---       vue = {
---         hybridMode = false,
---       },
---     },
---   }
--- end
+local function setup_volar_new_takeover(opts)
+  opts.servers = opts.servers or {}
+  opts.servers.tsserver = { enabled = false }
+  opts.servers.volar = {
+    filetypes = {
+      "typescript",
+      "javascript",
+      "javascriptreact",
+      "typescriptreact",
+      "vue",
+      "json",
+    },
+    init_options = {
+      vue = {
+        hybridMode = false,
+      },
+    },
+  }
+end
 
 return {
   {
@@ -106,7 +106,7 @@ return {
     "neovim/nvim-lspconfig",
     opts = function(_, opts)
       if is_vue_project() then -- if not vue project, skip config
-        setup_volar_old_takeover(opts)
+        setup_volar_new_takeover(opts)
       end
     end,
   },

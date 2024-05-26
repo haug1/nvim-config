@@ -20,6 +20,15 @@ return {
     end,
   },
   {
+    "WhoIsSethDaniel/mason-tool-installer.nvim",
+    opts = function(_, opts)
+      vim.list_extend(opts.ensure_installed, {
+        "clangd",
+        "clang-format",
+      })
+    end,
+  },
+  {
     "p00f/clangd_extensions.nvim",
     lazy = true,
     config = function()
@@ -114,5 +123,14 @@ return {
         require("clangd_extensions.cmp_scores")
       )
     end,
+  },
+  {
+    "stevearc/conform.nvim",
+    opts = {
+      formatters_by_ft = {
+        cpp = { "clang-format" },
+        hpp = { "clang-format" },
+      },
+    },
   },
 }

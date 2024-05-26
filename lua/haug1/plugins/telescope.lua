@@ -55,6 +55,7 @@ return {
       set("n", "<leader>sh", builtin.help_tags, { desc = "Help tags (Telescope)" })
       set("n", "<leader>sr", builtin.oldfiles, { desc = "Recent files (Telescope)" })
       set({ "n", "v" }, "<leader>sk", builtin.keymaps, { desc = "Keymaps (Telescope)" })
+      set({"n","v"}, "<leader>se", builtin.resume, {desc = "Resume last search"})
 
       local haug1_builtins = require("haug1.config.telescope")
       set("n", "<leader>sc", haug1_builtins.config_files, { desc = "Config files (Telescope)" })

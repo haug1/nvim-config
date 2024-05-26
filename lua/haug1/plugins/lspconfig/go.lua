@@ -1,3 +1,7 @@
+vim.filetype.add({
+  extension = { templ = "templ" },
+})
+
 return {
   {
     "nvim-treesitter/nvim-treesitter",
@@ -20,6 +24,7 @@ return {
         "gomodifytags", -- TODO: Expose code action with null-ls
         "impl", -- TODO: Expose code action with null-ls
         "delve",
+        "templ",
       })
     end,
   },
@@ -49,6 +54,7 @@ return {
     opts = {
       servers = {
         gopls = {
+          cmd_env = { GOFUMPT_SPLIT_LONG_LINES = "on" },
           settings = {
             gopls = {
               gofumpt = true,
