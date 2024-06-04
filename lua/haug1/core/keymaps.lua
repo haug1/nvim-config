@@ -83,8 +83,8 @@ local function prev_error()
 end
 
 -- stylua: ignore start
-set("n", "<leader>dp", prev_error, { desc = "Go to previous error [D]iagnostic message" })
-set("n", "<leader>dP", vim.diagnostic.goto_prev, { desc = "Go to previous [D]iagnostic message" })
-set("n", "<leader>dn", next_error, { desc = "Go to next error [D]iagnostic message" })
-set("n", "<leader>dN", vim.diagnostic.goto_next, { desc = "Go to next [D]iagnostic message" })
+set("n", "<leader>du", prev_error, { desc = "Go to previous error [D]iagnostic message" })
+set("n", "<leader>dU", vim.diagnostic.goto_prev, { desc = "Go to previous [D]iagnostic message" })
+set("n", "<leader>dd", next_error, { desc = "Go to next error [D]iagnostic message" })
+set("n", "<leader>dD", vim.diagnostic.goto_next, { desc = "Go to next [D]iagnostic message" })
 -- stylua: ignore end
