@@ -7,6 +7,16 @@ return {
       local lazy_status = require("lazy.status") -- to configure lazy pending updates count
       lualine.setup({
         sections = {
+          lualine_c = {
+            {
+              "buffers",
+              -- cond = function()
+              --   local buffers = require("haug1.config.buffers").get_buffers()
+              --   return #buffers > 1
+              -- end,
+              symbols = { modified = " ●" },
+            },
+          },
           lualine_x = {
             {
               lazy_status.updates,
