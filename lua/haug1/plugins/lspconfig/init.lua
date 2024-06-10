@@ -45,6 +45,9 @@ return {
   {
     "neovim/nvim-lspconfig",
     priority = 5, -- priority makes sure mason and lang specific config is already available
+    keys = {
+      { "<leader>lsr", "<cmd>LspRestart<CR>", desc = "Restart LSP" },
+    },
     dependencies = {
       "williamboman/mason-lspconfig.nvim",
       "WhoIsSethDaniel/mason-tool-installer.nvim",
