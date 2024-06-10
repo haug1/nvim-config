@@ -8,6 +8,7 @@ function M.delete_other_buffers()
       vim.api.nvim_buf_delete(bufnr, {})
     end
   end
+  require("lualine").refresh()
 end
 
 function M.new_buffer()
