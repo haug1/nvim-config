@@ -78,7 +78,7 @@ return {
                 rangeVariableTypes = true,
               },
               analyses = {
-                fieldalignment = true,
+                -- TODO: no longer supported(?) fieldalignment = true,
                 nilness = true,
                 unusedparams = true,
                 unusedwrite = true,

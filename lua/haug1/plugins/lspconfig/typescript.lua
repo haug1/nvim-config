@@ -2,13 +2,13 @@ return {
   {
     "williamboman/mason-lspconfig.nvim",
     opts = function(_, opts)
-      vim.list_extend(opts.ensure_installed, { "tsserver", "html", "cssls" })
+      vim.list_extend(opts.ensure_installed, { "ts_ls", "html", "cssls" })
     end,
   },
   {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
     opts = function(_, opts)
-      vim.list_extend(opts.ensure_installed, { "prettier", "eslint_d" })
+      vim.list_extend(opts.ensure_installed, { "prettier", "eslint" })
     end,
   },
   {
@@ -24,7 +24,7 @@ return {
     "neovim/nvim-lspconfig",
     opts = {
       servers = {
-        tsserver = {},
+        ts_ls = {},
       },
     },
   },
@@ -52,18 +52,6 @@ return {
     },
   },
   {
-    "mfussenegger/nvim-lint",
-    opts = {
-      linters_by_ft = {
-        javascript = { "eslint_d" },
-        typescript = { "eslint_d" },
-        javascriptreact = { "eslint_d" },
-        typescriptreact = { "eslint_d" },
-        svelte = { "eslint_d" },
-      },
-    },
-  },
-  {
     "nvim-neotest/neotest",
     dependencies = {
       "nvim-neotest/neotest-go",
@@ -72,7 +60,6 @@ return {
     opts = {
       adapters = {
         "neotest-vitest",
-        -- add jest?
       },
     },
   },
@@ -81,5 +68,4 @@ return {
     lazy = true,
     opts = {},
   },
-  -- TODO: debugging
 }

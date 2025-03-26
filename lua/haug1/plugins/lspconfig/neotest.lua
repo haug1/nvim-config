@@ -4,6 +4,7 @@ return {
     "nvim-neotest/nvim-nio",
     "nvim-lua/plenary.nvim",
     "nvim-treesitter/nvim-treesitter",
+    "marilari88/neotest-vitest",
   },
   config = function(_, opts)
     local neotest = require("neotest")
@@ -37,7 +38,6 @@ return {
     end
 
     neotest.setup(opts)
-    -- neotest.run.run()
   end,
   -- stylua: ignore start
   keys = {
