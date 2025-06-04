@@ -11,11 +11,11 @@ local function is_vue_project()
   return vim.fn.isdirectory(vue_path) == 1
 end
 
--- requires volar > 2.0
-local function setup_volar(opts)
+-- requires vue_ls > 2.0
+local function setup_vue_ls(opts)
   opts.servers = opts.servers or {}
   opts.servers.ts_ls = { enabled = false }
-  opts.servers.volar = {
+  opts.servers.vue_ls = {
     filetypes = {
       "typescript",
       "javascript",
@@ -45,7 +45,7 @@ return {
   {
     "williamboman/mason-lspconfig.nvim",
     opts = function(_, opts)
-      vim.list_extend(opts.ensure_installed, { "volar" })
+      vim.list_extend(opts.ensure_installed, { "vue_ls" })
     end,
   },
   {
@@ -60,7 +60,7 @@ return {
     "neovim/nvim-lspconfig",
     opts = function(_, opts)
       if is_vue_project() then -- if not vue project, skip config
-        setup_volar(opts)
+        setup_vue_ls(opts)
       end
     end,
   },

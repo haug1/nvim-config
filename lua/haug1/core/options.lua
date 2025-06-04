@@ -14,3 +14,6 @@ vim.filetype.add({
     templ = "templ",
   },
 })
+vim.o.title = true
+vim.o.titlestring =
+  "%{printf('nvim - %s', empty(expand('%:~')) ? fnamemodify(getcwd(), ':~') : expand('%:~'))}"
