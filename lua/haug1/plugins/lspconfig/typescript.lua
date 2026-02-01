@@ -2,13 +2,16 @@ return {
   {
     "mason-org/mason-lspconfig.nvim",
     opts = function(_, opts)
-      vim.list_extend(opts.ensure_installed, { "ts_ls", "html", "cssls", "eslint" })
+      vim.list_extend(
+        opts.ensure_installed,
+        { "ts_ls", "html", "cssls", "eslint" }
+      )
     end,
   },
   {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
     opts = function(_, opts)
-      vim.list_extend(opts.ensure_installed, { "prettier", "eslint" })
+      vim.list_extend(opts.ensure_installed, { "prettier" })
     end,
   },
   {

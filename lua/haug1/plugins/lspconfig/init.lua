@@ -117,14 +117,6 @@ return {
         local isBoolean = type(opts.servers[server_name].enabled) == "boolean"
         local isDisabled = isBoolean
           and opts.servers[server_name].enabled == false
-        print(
-          "Server: "
-            .. server_name
-            .. " has boolean: "
-            .. tostring(isBoolean)
-            .. " and is disabled: "
-            .. tostring(isDisabled)
-        )
         if not isDisabled then
           server.capabilities = vim.tbl_deep_extend(
             "force",

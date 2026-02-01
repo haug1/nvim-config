@@ -44,8 +44,11 @@ return {
   {
     "neovim/nvim-lspconfig",
     opts = function(_, opts)
-      local vue_language_server_path =
-        "/home/main/.local/share/nvim/mason/packages/vue-language-server/node_modules/@vue/language-server"
+      local mason_registry = require("mason-registry")
+      local vue_language_server_path = vim.fn.expand(
+        "$MASON/packages/vue-language-server/node_modules/@vue/language-server"
+      )
+      print(vue_language_server_path)
       local vue_plugin = {
         name = "@vue/typescript-plugin",
         location = vue_language_server_path,
@@ -74,7 +77,7 @@ return {
       local is_vue = is_vue_project()
       if is_vue then -- if not vue project, skip config
         opts.servers = opts.servers or {}
-        -- opts.servers.ts_ls = { enabled = false }
+        opts.servers.ts_ls = { enabled = false }
         opts.servers.vtsls = vtsls_config
         opts.servers.vue_ls = {
           filetypes = {
@@ -87,7 +90,7 @@ return {
           },
           init_options = {
             typescript = {
-              tsdk = "/home/main/.local/share/nvim/mason/packages/vue-language-server/node_modules/typescript/lib",
+              tsdk = vue_language_server_path,
             },
             vue = {
               hybridMode = false,
