@@ -1,28 +1,14 @@
 return {
-  -- mason_lspconfig.setup({
-  --   -- list of servers for mason to install
-  --   ensure_installed = {
-  --     "terraformls",
-  --     "emmet_ls",
-  --     "ocamllsp",
-  --   },
-  -- })
-
-  -- mason_tool_installer.setup({
-  --   ensure_installed = {
-  --     "tflint",
-  --     "shfmt",
-  --   },
-  -- })
   {
-    "williamboman/mason-lspconfig.nvim",
+    "mason-org/mason-lspconfig.nvim",
     dependencies = {
-      "williamboman/mason.nvim",
+      "mason-org/mason.nvim",
     },
     priority = 5,
     opts = function(_, opts)
       opts.ensure_installed = opts.ensure_installed or {}
       vim.list_extend(opts.ensure_installed, { "bashls", "jsonls" })
+      opts.automatic_enable = false
     end,
     config = function(_, opts)
       require("mason").setup({
@@ -45,11 +31,12 @@ return {
   {
     "neovim/nvim-lspconfig",
     priority = 5, -- priority makes sure mason and lang specific config is already available
+    event = "VeryLazy",
     keys = {
       { "<leader>lsr", "<cmd>LspRestart<CR>", desc = "Restart LSP" },
     },
     dependencies = {
-      "williamboman/mason-lspconfig.nvim",
+      "mason-org/mason-lspconfig.nvim",
       "WhoIsSethDaniel/mason-tool-installer.nvim",
       { "j-hui/fidget.nvim", opts = {} },
       { "folke/neodev.nvim", opts = {} },
@@ -122,25 +109,36 @@ return {
         require("cmp_nvim_lsp").default_capabilities()
       )
 
-      require("mason-lspconfig").setup_handlers({
-        function(server_name)
-          local server = opts.servers[server_name] or {}
+      vim.lsp.config("*", {
+        capabilities = capabilities,
+      })
+
+      for server_name, server in pairs(opts.servers) do
+        local isBoolean = type(opts.servers[server_name].enabled) == "boolean"
+        local isDisabled = isBoolean
+          and opts.servers[server_name].enabled == false
+        print(
+          "Server: "
+            .. server_name
+            .. " has boolean: "
+            .. tostring(isBoolean)
+            .. " and is disabled: "
+            .. tostring(isDisabled)
+        )
+        if not isDisabled then
           server.capabilities = vim.tbl_deep_extend(
             "force",
             {},
             capabilities,
             server.capabilities or {}
           )
-
-          -- expose possibility to run my own custom setup function from the opts
           if type(server.my_setup_func) == "function" then
             server.my_setup_func()
-            server.my_setup_func = nil
           end
-
-          require("lspconfig")[server_name].setup(server)
-        end,
-      })
+          vim.lsp.config(server_name, server)
+          vim.lsp.enable(server_name)
+        end
+      end
     end,
   },
 }
