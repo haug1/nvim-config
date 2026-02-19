@@ -1,8 +1,8 @@
 return {
-  {
-    "supermaven-inc/supermaven-nvim",
-    opts = {
-      color = "#dddddd",
-    },
-  },
+  -- {
+  --   "supermaven-inc/supermaven-nvim",
+  --   opts = {
+  --     color = "#dddddd",
+  --   },
+  -- },
 }
