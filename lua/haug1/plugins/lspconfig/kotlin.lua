@@ -2,41 +2,22 @@ return {
   {
     "mason-org/mason-lspconfig.nvim",
     opts = function(_, opts)
-      vim.list_extend(opts.ensure_installed, { "kotlin_language_server" })
+      vim.list_extend(opts.ensure_installed, { "kotlin_lsp" })
     end,
   },
   {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
     opts = function(_, opts)
-      vim.list_extend(opts.ensure_installed, { "ktlint", "kotlin-debug-adapter" })
+      vim.list_extend(opts.ensure_installed, { "ktlint", "kotlin-lsp", "kotlin-debug-adapter" })
     end,
   },
   {
     "neovim/nvim-lspconfig",
-    opts = function(_, opts)
-      opts.servers = opts.servers or {}
-
-      local java21_candidates = vim.fn.glob(
-        vim.fn.expand("$HOME/.sdkman/candidates/java/21*"),
-        false,
-        true
-      )
-      local java21_home = java21_candidates[1]
-
-      local server_opts = {}
-      if java21_home and java21_home ~= "" and vim.fn.isdirectory(java21_home) == 1 then
-        server_opts.cmd_env = {
-          JAVA_HOME = java21_home,
-          PATH = java21_home .. "/bin:" .. vim.env.PATH,
-        }
-      end
-
-      opts.servers.kotlin_language_server = vim.tbl_deep_extend(
-        "force",
-        opts.servers.kotlin_language_server or {},
-        server_opts
-      )
-    end,
+    opts = {
+      servers = {
+        kotlin_lsp = {},
+      },
+    },
   },
   {
     "stevearc/conform.nvim",
