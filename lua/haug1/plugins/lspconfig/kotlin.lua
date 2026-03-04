@@ -8,7 +8,7 @@ return {
   {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
     opts = function(_, opts)
-      vim.list_extend(opts.ensure_installed, { "ktlint", "kotlin-lsp", "kotlin-debug-adapter" })
+      vim.list_extend(opts.ensure_installed, { "ktfmt", "ktlint", "kotlin-lsp", "kotlin-debug-adapter" })
     end,
   },
   {
@@ -23,7 +23,7 @@ return {
     "stevearc/conform.nvim",
     opts = {
       formatters_by_ft = {
-        kotlin = { "ktlint" },
+        kotlin = { "ktfmt" },
       },
     },
   },
