@@ -8,16 +8,21 @@ return {
   {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
     opts = function(_, opts)
-      vim.list_extend(opts.ensure_installed, { "ktfmt", "ktlint", "kotlin-lsp", "kotlin-debug-adapter" })
+      vim.list_extend(opts.ensure_installed, {
+        "ktfmt",
+        "ktlint",
+        "kotlin-lsp",
+        "kotlin-debug-adapter",
+      })
     end,
   },
   {
     "neovim/nvim-lspconfig",
-    opts = {
-      servers = {
-        kotlin_lsp = {},
-      },
-    },
+    opts = function(_, opts)
+      opts.servers = opts.servers or {}
+      opts.servers.kotlin_lsp = {}
+      opts.servers.kotlin_language_server = { enabled = false }
+    end,
   },
   {
     "stevearc/conform.nvim",
@@ -54,7 +59,8 @@ return {
 
       local mason_adapter = vim.fn.stdpath("data")
         .. "/mason/bin/kotlin-debug-adapter"
-      local adapter_cmd = vim.fn.executable(mason_adapter) == 1 and mason_adapter
+      local adapter_cmd = vim.fn.executable(mason_adapter) == 1
+          and mason_adapter
         or "kotlin-debug-adapter"
 
       dap.adapters.kotlin = {
