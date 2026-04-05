@@ -24,6 +24,9 @@ return {
           hl.Comment = {
             fg = "#008000",
           }
+          hl.LineNr = {
+            fg = "#526176",
+          }
         end,
       })
       vim.cmd([[colorscheme tokyonight-night]])
