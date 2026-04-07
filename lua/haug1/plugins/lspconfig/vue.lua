@@ -21,7 +21,7 @@ return {
   {
     "mason-org/mason-lspconfig.nvim",
     opts = function(_, opts)
-      vim.list_extend(opts.ensure_installed, { "vue_ls" })
+      vim.list_extend(opts.ensure_installed, { "vue_ls", "vtsls" })
     end,
   },
   {
