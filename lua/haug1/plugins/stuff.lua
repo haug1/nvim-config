@@ -1,7 +1,7 @@
 return {
   "nvim-lua/plenary.nvim",
   "tpope/vim-sleuth",
-  { "numToStr/Comment.nvim", opts = {} },
+  -- commenting (gc/gcc) is built into Neovim 0.10+
   "stevearc/dressing.nvim",
   "mg979/vim-visual-multi",
   {
