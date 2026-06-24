@@ -51,7 +51,6 @@ return {
         "html",
         "jsdoc",
         "json",
-        "jsonc",
         "markdown",
         "markdown_inline",
         "python",
@@ -68,6 +67,9 @@ return {
       },
     },
     config = function(_, opts)
+      -- jsonc shares the json grammar (main has no separate jsonc parser)
+      vim.treesitter.language.register("json", "jsonc")
+
       require("nvim-treesitter").install(opts.ensure_installed)
 
       -- incremental selection (main dropped the built-in module)
