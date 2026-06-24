@@ -70,6 +70,9 @@ return {
     config = function(_, opts)
       require("nvim-treesitter").install(opts.ensure_installed)
 
+      -- incremental selection (main dropped the built-in module)
+      require("haug1.config.treesitter_incremental").setup()
+
       vim.api.nvim_create_autocmd("FileType", {
         desc = "Treesitter: start highlight + indent (auto-install parsers)",
         callback = function(args)
