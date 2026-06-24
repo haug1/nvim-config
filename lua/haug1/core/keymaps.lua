@@ -72,19 +72,23 @@ set("n", "<C-o>", "<C-o>zz")
 set("n", "<C-i>", "<C-i>zz")
 
 local function next_error()
-  vim.diagnostic.goto_next({
+  vim.diagnostic.jump({
+    count = 1,
+    float = true,
     severity = vim.diagnostic.severity.ERROR,
   })
 end
 local function prev_error()
-  vim.diagnostic.goto_next({
+  vim.diagnostic.jump({
+    count = -1,
+    float = true,
     severity = vim.diagnostic.severity.ERROR,
   })
 end
 
 -- stylua: ignore start
 set("n", "<leader>du", prev_error, { desc = "Go to previous error [D]iagnostic message" })
-set("n", "<leader>dU", vim.diagnostic.goto_prev, { desc = "Go to previous [D]iagnostic message" })
+set("n", "<leader>dU", function() vim.diagnostic.jump({ count = -1, float = true }) end, { desc = "Go to previous [D]iagnostic message" })
 set("n", "<leader>dd", next_error, { desc = "Go to next error [D]iagnostic message" })
-set("n", "<leader>dD", vim.diagnostic.goto_next, { desc = "Go to next [D]iagnostic message" })
+set("n", "<leader>dD", function() vim.diagnostic.jump({ count = 1, float = true }) end, { desc = "Go to next [D]iagnostic message" })
 -- stylua: ignore end
