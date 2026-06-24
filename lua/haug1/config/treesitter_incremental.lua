@@ -71,6 +71,9 @@ local function grow(range)
   local ok, node = pcall(vim.treesitter.get_node, {
     bufnr = cur_buf(),
     pos = { range[1], range[2] },
+    -- descend into injected languages (e.g. <script> in .vue) so growth
+    -- stays granular instead of jumping to the outer-tree node
+    ignore_injections = false,
   })
   if not ok or not node then
     return nil
@@ -86,7 +89,10 @@ local function grow(range)
 end
 
 function M.init()
-  local ok, node = pcall(vim.treesitter.get_node, { bufnr = cur_buf() })
+  local ok, node = pcall(vim.treesitter.get_node, {
+    bufnr = cur_buf(),
+    ignore_injections = false,
+  })
   if not ok or not node then
     return
   end
