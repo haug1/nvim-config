@@ -1,5 +1,13 @@
 return {
   {
+    -- tree-sitter CLI: required by nvim-treesitter `main` to build parsers
+    "WhoIsSethDaniel/mason-tool-installer.nvim",
+    opts = function(_, opts)
+      opts.ensure_installed = opts.ensure_installed or {}
+      vim.list_extend(opts.ensure_installed, { "tree-sitter-cli" })
+    end,
+  },
+  {
     "nvim-treesitter/nvim-treesitter-textobjects",
     branch = "master",
     init = function() end,
