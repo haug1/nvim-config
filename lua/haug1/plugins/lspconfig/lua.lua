@@ -1,5 +1,24 @@
 return {
   {
+    "folke/lazydev.nvim",
+    ft = "lua",
+    opts = {
+      library = {
+        -- Load luvit types when the `vim.uv` word is found
+        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+      },
+    },
+  },
+  {
+    "hrsh7th/nvim-cmp",
+    opts = function(_, opts)
+      table.insert(opts.sources, 1, {
+        name = "lazydev",
+        group_index = 0, -- skip LuaLS completions for require paths
+      })
+    end,
+  },
+  {
     "mason-org/mason-lspconfig.nvim",
     opts = function(_, opts)
       vim.list_extend(opts.ensure_installed, { "lua_ls", "clangd" })

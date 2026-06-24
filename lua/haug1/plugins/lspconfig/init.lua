@@ -39,7 +39,6 @@ return {
       "mason-org/mason-lspconfig.nvim",
       "WhoIsSethDaniel/mason-tool-installer.nvim",
       { "j-hui/fidget.nvim", opts = {} },
-      { "folke/neodev.nvim", opts = {} },
     },
     config = function(_, opts)
       vim.api.nvim_create_autocmd("LspAttach", {
