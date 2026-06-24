@@ -20,8 +20,12 @@ return {
           gs.blame_line({ full = true })
         end
 
-        map("n", "<leader>hd", gs.next_hunk, "Next hunk")
-        map("n", "<leader>hu", gs.prev_hunk, "Prev hunk")
+        map("n", "<leader>hd", function()
+          gs.nav_hunk("next")
+        end, "Next hunk")
+        map("n", "<leader>hu", function()
+          gs.nav_hunk("prev")
+        end, "Prev hunk")
         map("n", "<leader>hp", gs.preview_hunk_inline, "Preview hunk inline")
         map("n", "<leader>hr", gs.reset_hunk, "Reset hunk")
         map("n", "<leader>hb", blame, "Blame line")
