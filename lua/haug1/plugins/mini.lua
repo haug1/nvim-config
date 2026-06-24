@@ -1,21 +1,3 @@
-local function on_load(name, fn)
-  -- copy-pasta from lazyvim
-  local Config = require("lazy.core.config")
-  if Config.plugins[name] and Config.plugins[name]._.loaded then
-    fn(name)
-  else
-    vim.api.nvim_create_autocmd("User", {
-      pattern = "LazyLoad",
-      callback = function(event)
-        if event.data == name then
-          fn(name)
-          return true
-        end
-      end,
-    })
-  end
-end
-
 return {
   {
     -- copy-pasta from lazyvim
@@ -72,63 +54,6 @@ return {
     end,
     config = function(_, opts)
       require("mini.ai").setup(opts)
-      -- register all text objects with which-key
-      on_load("which-key.nvim", function()
-        ---@type table<string, string|table>
-        local i = {
-          [" "] = "Whitespace",
-          ['"'] = 'Balanced "',
-          ["'"] = "Balanced '",
-          ["`"] = "Balanced `",
-          ["("] = "Balanced (",
-          [")"] = "Balanced ) including white-space",
-          [">"] = "Balanced > including white-space",
-          ["<lt>"] = "Balanced <",
-          ["]"] = "Balanced ] including white-space",
-          ["["] = "Balanced [",
-          ["}"] = "Balanced } including white-space",
-          ["{"] = "Balanced {",
-          ["?"] = "User Prompt",
-          _ = "Underscore",
-          a = "Argument",
-          b = "Balanced ), ], }",
-          c = "Class",
-          d = "Digit(s)",
-          e = "Word in CamelCase & snake_case",
-          f = "Function",
-          g = "Entire file",
-          o = "Block, conditional, loop",
-          q = "Quote `, \", '",
-          t = "Tag",
-          u = "Use/call function & method",
-          U = "Use/call without dot in name",
-        }
-        local a = vim.deepcopy(i)
-        for k, v in pairs(a) do
-          -- NOTE: warning, but in folke we trust
-          a[k] = v:gsub(" including.*", "")
-        end
-
-        local ic = vim.deepcopy(i)
-        local ac = vim.deepcopy(a)
-        for key, name in pairs({ n = "Next", l = "Last" }) do
-          i[key] = vim.tbl_extend(
-            "force",
-            { name = "Inside " .. name .. " textobject" },
-            ic
-          )
-          a[key] = vim.tbl_extend(
-            "force",
-            { name = "Around " .. name .. " textobject" },
-            ac
-          )
-        end
-        require("which-key").register({
-          mode = { "o", "x" },
-          i = i,
-          a = a,
-        })
-      end)
     end,
   },
   {
