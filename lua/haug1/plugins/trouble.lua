@@ -5,27 +5,27 @@ return {
   keys = {
     {
       "<leader>xx",
-      "<cmd>TroubleToggle<CR>",
+      "<cmd>Trouble diagnostics toggle<CR>",
       desc = "Open/close trouble list",
     },
     {
       "<leader>xw",
-      "<cmd>TroubleToggle workspace_diagnostics<CR>",
-      desc = "Open trouble workspace diagnostics",
+      "<cmd>Trouble symbols toggle<CR>",
+      desc = "Open trouble symbols",
     },
     {
       "<leader>xd",
-      "<cmd>TroubleToggle document_diagnostics<CR>",
+      "<cmd>Trouble diagnostics toggle filter.buf=0<CR>",
       desc = "Open trouble document diagnostics",
     },
     {
       "<leader>xq",
-      "<cmd>TroubleToggle quickfix<CR>",
+      "<cmd>Trouble qflist toggle<CR>",
       desc = "Open trouble quickfix list",
     },
     {
       "<leader>xl",
-      "<cmd>TroubleToggle loclist<CR>",
+      "<cmd>Trouble loclist toggle<CR>",
       desc = "Open trouble location list",
     },
     { "<leader>xt", "<cmd>TodoTrouble<CR>", desc = "Open todos in trouble" },
