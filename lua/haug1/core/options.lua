@@ -4,6 +4,10 @@ vim.g.maplocalleader = "\\"
 -- Disable netrw early (before it loads) so nvim-tree owns directories
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
+
+-- Shorter mapping timeout for multi-key sequences (was set via which-key)
+vim.o.timeout = true
+vim.o.timeoutlen = 300
 vim.opt.winbar = "%=%m %f"
 vim.opt.expandtab = true
 vim.opt.tabstop = 2
