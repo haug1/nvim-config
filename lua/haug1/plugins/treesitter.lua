@@ -9,8 +9,34 @@ return {
   },
   {
     "nvim-treesitter/nvim-treesitter-textobjects",
-    branch = "master",
-    init = function() end,
+    branch = "main",
+    config = function()
+      require("nvim-treesitter-textobjects").setup({
+        move = { set_jumps = true },
+      })
+      local move = require("nvim-treesitter-textobjects.move")
+      local function map(lhs, fn, query, desc)
+        vim.keymap.set({ "n", "x", "o" }, lhs, function()
+          fn(query, "textobjects")
+        end, { desc = desc })
+      end
+      -- next start
+      map("<leader>Nf", move.goto_next_start, "@function.inner", "Next function")
+      map("<leader>Nc", move.goto_next_start, "@class.inner", "Next class")
+      map("<leader>Na", move.goto_next_start, "@parameter.inner", "Next parameter")
+      -- next end
+      map("<leader>nf", move.goto_next_end, "@function.inner", "Next function end")
+      map("<leader>nc", move.goto_next_end, "@class.inner", "Next class end")
+      map("<leader>na", move.goto_next_end, "@parameter.inner", "Next parameter end")
+      -- previous start
+      map("<leader>pf", move.goto_previous_start, "@function.inner", "Prev function")
+      map("<leader>pc", move.goto_previous_start, "@class.inner", "Prev class")
+      map("<leader>pa", move.goto_previous_start, "@parameter.inner", "Prev parameter")
+      -- previous end
+      map("<leader>Pf", move.goto_previous_end, "@function.inner", "Prev function end")
+      map("<leader>Pc", move.goto_previous_end, "@class.inner", "Prev class end")
+      map("<leader>Pa", move.goto_previous_end, "@parameter.inner", "Prev parameter end")
+    end,
   },
   {
     "nvim-treesitter/nvim-treesitter",
