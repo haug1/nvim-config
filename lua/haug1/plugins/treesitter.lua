@@ -14,18 +14,10 @@ return {
   },
   {
     "nvim-treesitter/nvim-treesitter",
-    branch = "master",
-    event = { "BufReadPre", "BufNewFile" },
+    branch = "main",
+    lazy = false, -- main does not support lazy-loading
     build = ":TSUpdate",
-    cmd = { "TSUpdateSync", "TSUpdate", "TSInstall" },
-    keys = {
-      { "<c-space>", desc = "Increment Selection" },
-      { "<bs>", desc = "Decrement Selection", mode = "x" },
-    },
     opts = {
-      auto_install = true,
-      highlight = { enable = true },
-      indent = { enable = true },
       ensure_installed = {
         "bash",
         "c",
@@ -48,44 +40,32 @@ return {
         "go",
         "kotlin",
       },
-      incremental_selection = {
-        enable = true,
-        keymaps = {
-          init_selection = "<C-space>",
-          node_incremental = "<C-space>",
-          scope_incremental = false,
-          node_decremental = "<bs>",
-        },
-      },
-      textobjects = {
-        move = {
-          enable = true,
-          set_jumps = true,
-          goto_next_start = {
-            ["<leader>Nf"] = "@function.inner",
-            ["<leader>Nc"] = "@class.inner",
-            ["<leader>Na"] = "@parameter.inner",
-          },
-          goto_next_end = {
-            ["<leader>nf"] = "@function.inner",
-            ["<leader>nc"] = "@class.inner",
-            ["<leader>na"] = "@parameter.inner",
-          },
-          goto_previous_start = {
-            ["<leader>pf"] = "@function.inner",
-            ["<leader>pc"] = "@class.inner",
-            ["<leader>pa"] = "@parameter.inner",
-          },
-          goto_previous_end = {
-            ["<leader>Pf"] = "@function.inner",
-            ["<leader>Pc"] = "@class.inner",
-            ["<leader>Pa"] = "@parameter.inner",
-          },
-        },
-      },
     },
     config = function(_, opts)
-      require("nvim-treesitter.configs").setup(opts)
+      require("nvim-treesitter").install(opts.ensure_installed)
+
+      vim.api.nvim_create_autocmd("FileType", {
+        desc = "Treesitter: start highlight + indent (auto-install parsers)",
+        callback = function(args)
+          local lang = vim.treesitter.language.get_lang(vim.bo[args.buf].filetype)
+          if not lang then
+            return
+          end
+          -- parser not present yet: auto-install if the CLI offers it, then
+          -- bail (install is async; the buffer highlights on next open)
+          if not vim.treesitter.language.add(lang) then
+            local ok, available =
+              pcall(require("nvim-treesitter").get_available)
+            if ok and vim.tbl_contains(available, lang) then
+              require("nvim-treesitter").install(lang)
+            end
+            return
+          end
+          vim.treesitter.start(args.buf, lang)
+          vim.bo[args.buf].indentexpr =
+            "v:lua.require'nvim-treesitter'.indentexpr()"
+        end,
+      })
     end,
   },
 }
