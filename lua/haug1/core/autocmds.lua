@@ -8,7 +8,7 @@ vim.api.nvim_create_autocmd("ColorScheme", {
       "Folded",
       "NonText",
       "SpecialKey",
-      "VertSplit",
+      "WinSeparator",
       "SignColumn",
       "EndOfBuffer",
     }
