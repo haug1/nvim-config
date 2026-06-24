@@ -1,6 +1,4 @@
-vim.filetype.add({
-  extension = { templ = "templ" },
-})
+-- the templ filetype is registered in core/options.lua
 
 return {
   {
