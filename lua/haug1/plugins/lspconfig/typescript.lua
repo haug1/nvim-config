@@ -4,7 +4,7 @@ return {
     opts = function(_, opts)
       vim.list_extend(
         opts.ensure_installed,
-        { "ts_ls", "html", "cssls", "eslint" }
+        { "vtsls", "html", "cssls", "eslint" }
       )
     end,
   },
@@ -27,7 +27,25 @@ return {
     "neovim/nvim-lspconfig",
     opts = {
       servers = {
-        ts_ls = {},
+        -- Single TypeScript server for all JS/TS. Vue support is layered
+        -- on in vue.lua (it injects @vue/typescript-plugin and the `vue`
+        -- filetype). Svelte is self-contained, so it is intentionally
+        -- absent here.
+        vtsls = {
+          settings = {
+            vtsls = {
+              tsserver = {
+                globalPlugins = {},
+              },
+            },
+          },
+          filetypes = {
+            "typescript",
+            "javascript",
+            "javascriptreact",
+            "typescriptreact",
+          },
+        },
         eslint = {
           settings = {
             workingDirectories = { mode = "auto" },
