@@ -1,13 +1,12 @@
 local function is_vue_project()
   local current_path = vim.fn.expand("%:p:h")
-  local util = require("lspconfig.util")
   local project_root = vim.fs.dirname(
     vim.fs.find("node_modules", { path = current_path, upward = true })[1]
   )
   if not project_root then
     return false
   end
-  local vue_path = util.path.join(project_root, "node_modules", "vue")
+  local vue_path = vim.fs.joinpath(project_root, "node_modules", "vue")
   return vim.fn.isdirectory(vue_path) == 1
 end
 
@@ -74,7 +73,6 @@ return {
 
       local is_vue = is_vue_project()
       if is_vue then -- if not vue project, skip config
-        print(vue_language_server_path)
         opts.servers = opts.servers or {}
         opts.servers.ts_ls = { enabled = false }
         opts.servers.vtsls = vtsls_config
