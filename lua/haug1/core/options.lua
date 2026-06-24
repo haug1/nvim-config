@@ -1,5 +1,9 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
+
+-- Disable netrw early (before it loads) so nvim-tree owns directories
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
 vim.opt.winbar = "%=%m %f"
 vim.opt.expandtab = true
 vim.opt.tabstop = 2
