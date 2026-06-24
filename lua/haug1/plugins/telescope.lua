@@ -29,8 +29,8 @@ return {
           },
           mappings = {
             i = {
-              ["<C-k>"] = move_next,
-              ["<C-j>"] = move_prev,
+              ["<C-j>"] = move_next,
+              ["<C-k>"] = move_prev,
             },
           },
         },
