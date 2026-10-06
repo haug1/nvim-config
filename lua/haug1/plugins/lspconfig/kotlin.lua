@@ -11,7 +11,6 @@ return {
       vim.list_extend(opts.ensure_installed, {
         "ktfmt",
         "ktlint",
-        "kotlin-lsp",
         "kotlin-debug-adapter",
       })
     end,

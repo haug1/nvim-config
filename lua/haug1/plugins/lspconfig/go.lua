@@ -13,10 +13,15 @@ return {
     end,
   },
   {
+    "mason-org/mason-lspconfig.nvim",
+    opts = function(_, opts)
+      vim.list_extend(opts.ensure_installed, { "gopls" })
+    end,
+  },
+  {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
     opts = function(_, opts)
       vim.list_extend(opts.ensure_installed, {
-        "gopls",
         "goimports",
         "gofumpt",
         "gomodifytags", -- TODO: Expose code action with null-ls

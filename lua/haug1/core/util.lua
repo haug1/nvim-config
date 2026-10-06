@@ -1,5 +1,19 @@
 local M = {}
 
+function M.is_nixos()
+  return vim.fn.filereadable("/etc/NIXOS") == 1
+end
+
+function M.executable_outside_mason(name)
+  local executable = vim.fn.exepath(name)
+  if executable == "" then
+    return false
+  end
+
+  local mason_bin = vim.fs.normalize(vim.fn.stdpath("data") .. "/mason/bin")
+  return not executable:find(mason_bin, 1, true)
+end
+
 function M.index_of(array, value)
   for i, v in ipairs(array) do
     if v == value then

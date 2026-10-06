@@ -20,12 +20,15 @@ return {
     end,
   },
   {
+    "mason-org/mason-lspconfig.nvim",
+    opts = function(_, opts)
+      vim.list_extend(opts.ensure_installed, { "clangd" })
+    end,
+  },
+  {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
     opts = function(_, opts)
-      vim.list_extend(opts.ensure_installed, {
-        "clangd",
-        "clang-format",
-      })
+      vim.list_extend(opts.ensure_installed, { "clang-format" })
     end,
   },
   {
@@ -65,18 +68,16 @@ return {
     "neovim/nvim-lspconfig",
     opts = {
       servers = {
-        -- Ensure mason installs the server
         clangd = {
           my_setup_func = function()
             require("clangd_extensions").setup(_opts("clangd_extensions.nvim"))
-          end,
-          keys = {
-            {
+            vim.keymap.set(
+              "n",
               "<leader>cR",
               "<cmd>ClangdSwitchSourceHeader<cr>",
-              desc = "Switch Source/Header (C/C++)",
-            },
-          },
+              { desc = "Switch Source/Header (C/C++)" }
+            )
+          end,
           root_dir = function(bufnr, on_dir)
             local fname = vim.api.nvim_buf_get_name(bufnr)
             local root = vim.fs.root(fname, {

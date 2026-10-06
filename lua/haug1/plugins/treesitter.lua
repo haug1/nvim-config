@@ -1,13 +1,5 @@
 return {
   {
-    -- tree-sitter CLI: required by nvim-treesitter `main` to build parsers
-    "WhoIsSethDaniel/mason-tool-installer.nvim",
-    opts = function(_, opts)
-      opts.ensure_installed = opts.ensure_installed or {}
-      vim.list_extend(opts.ensure_installed, { "tree-sitter-cli" })
-    end,
-  },
-  {
     "nvim-treesitter/nvim-treesitter-textobjects",
     branch = "main",
     config = function()
@@ -70,7 +62,15 @@ return {
       -- jsonc shares the json grammar (main has no separate jsonc parser)
       vim.treesitter.language.register("json", "jsonc")
 
-      require("nvim-treesitter").install(opts.ensure_installed)
+      local has_tree_sitter_cli = vim.fn.executable("tree-sitter") == 1
+      if has_tree_sitter_cli then
+        require("nvim-treesitter").install(opts.ensure_installed)
+      else
+        vim.notify(
+          "nvim-treesitter needs the tree-sitter CLI (0.26.1+) on PATH to install parsers",
+          vim.log.levels.WARN
+        )
+      end
 
       -- incremental selection (main dropped the built-in module)
       require("haug1.config.treesitter_incremental").setup()
@@ -87,7 +87,11 @@ return {
           if not vim.treesitter.language.add(lang) then
             local ok, available =
               pcall(require("nvim-treesitter").get_available)
-            if ok and vim.tbl_contains(available, lang) then
+            if
+              has_tree_sitter_cli
+              and ok
+              and vim.tbl_contains(available, lang)
+            then
               require("nvim-treesitter").install(lang)
             end
             return

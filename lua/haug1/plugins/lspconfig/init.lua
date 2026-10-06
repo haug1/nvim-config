@@ -11,7 +11,11 @@ return {
       opts.automatic_enable = false
     end,
     config = function(_, opts)
+      local is_nixos = require("haug1.core.util").is_nixos()
       require("mason").setup({
+        -- On NixOS, prefer tools supplied by the active system or dev shell.
+        -- Mason's generic Linux binaries may depend on a loader unavailable there.
+        PATH = is_nixos and "append" or "prepend",
         ui = {
           icons = {
             package_installed = "✓",
@@ -113,20 +117,23 @@ return {
       })
 
       for server_name, server in pairs(opts.servers) do
-        local isBoolean = type(opts.servers[server_name].enabled) == "boolean"
-        local isDisabled = isBoolean
-          and opts.servers[server_name].enabled == false
-        if not isDisabled then
-          server.capabilities = vim.tbl_deep_extend(
+        if server.enabled ~= false then
+          local server_config = vim.deepcopy(server)
+          server_config.enabled = nil
+          server_config.keys = nil
+          local setup_func = server_config.my_setup_func
+          server_config.my_setup_func = nil
+
+          server_config.capabilities = vim.tbl_deep_extend(
             "force",
             {},
             capabilities,
-            server.capabilities or {}
+            server_config.capabilities or {}
           )
-          if type(server.my_setup_func) == "function" then
-            server.my_setup_func()
+          if type(setup_func) == "function" then
+            setup_func()
           end
-          vim.lsp.config(server_name, server)
+          vim.lsp.config(server_name, server_config)
           vim.lsp.enable(server_name)
         end
       end

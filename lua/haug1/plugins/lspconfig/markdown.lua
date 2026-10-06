@@ -11,10 +11,15 @@ return {
     end,
   },
   {
+    "mason-org/mason-lspconfig.nvim",
+    opts = function(_, opts)
+      vim.list_extend(opts.ensure_installed, { "marksman" })
+    end,
+  },
+  {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
     opts = function(_, opts)
-      opts.ensure_installed = opts.ensure_installed or {}
-      vim.list_extend(opts.ensure_installed, { "markdownlint", "marksman" })
+      vim.list_extend(opts.ensure_installed, { "markdownlint" })
     end,
   },
   {

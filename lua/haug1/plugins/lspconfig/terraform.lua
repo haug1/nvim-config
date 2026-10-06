@@ -11,11 +11,9 @@ return {
     end,
   },
   {
-    "WhoIsSethDaniel/mason-tool-installer.nvim",
+    "mason-org/mason-lspconfig.nvim",
     opts = function(_, opts)
-      vim.list_extend(opts.ensure_installed, {
-        "terraformls",
-      })
+      vim.list_extend(opts.ensure_installed, { "terraformls" })
     end,
   },
   {

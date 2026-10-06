@@ -23,19 +23,18 @@ return { -- Autoformat
     },
   },
   opts = {
-    notify_on_error = false,
-    format_on_save = function(bufnr)
+    -- Surface missing/broken formatter executables instead of failing silently.
+    notify_on_error = true,
+    format_on_save = function()
       if not do_auto_format then
         return
       end
 
-      -- Disable "format_on_save lsp_fallback" for languages that don't
-      -- have a well standardized coding style. You can add additional
-      -- languages here or re-enable it for the disabled ones.
-      local disable_filetypes = { c = true, cpp = true }
       return {
-        timeout_ms = 500,
-        lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
+        timeout_ms = 2000,
+        -- Save formatting should use only explicitly configured formatters.
+        -- LSP formatting remains available through the manual format mapping.
+        lsp_fallback = false,
       }
     end,
   },
