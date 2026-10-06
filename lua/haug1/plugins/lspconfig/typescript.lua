@@ -19,7 +19,7 @@ return {
     opts = function(_, opts)
       vim.list_extend(
         opts.ensure_installed,
-        { "javascript", "typescript", "scss" }
+        { "javascript", "typescript", "scss", "css" }
       )
     end,
   },
