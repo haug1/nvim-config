@@ -1,17 +1,73 @@
--- implements cycling between terminals and other QoL features for terminals
--- adds terminal keymaps
--- based on https://github.com/akinsho/toggleterm.nvim
+-- Terminal keymaps and cycling on top of toggleterm.nvim.
 
 local util = require("haug1.core.util")
-local Terminal = require("toggleterm.terminal").Terminal
+local toggleterm = require("toggleterm.terminal")
+local Terminal = toggleterm.Terminal
 
-local terminal_id_counter = 0
-local selected_terminal = terminal_id_counter
-local terminals = {}
 local remember_direction = "float"
-local lazygit_terminal = nil
+local lazygit_terminal
+local current_toggleterm
 
 local M = {}
+
+local function get_terminal(id)
+  if not id then
+    return nil
+  end
+  return toggleterm.get(id, true)
+end
+
+local function set_selected(id)
+  vim.g.haug1_toggleterm_selected = id
+end
+
+local function resolve_selected()
+  local terminals = toggleterm.get_all()
+  local selected_id = vim.g.haug1_toggleterm_selected
+
+  for index, terminal in ipairs(terminals) do
+    if terminal.id == selected_id then
+      return terminal, index, terminals
+    end
+  end
+
+  if #terminals == 0 then
+    set_selected(nil)
+    return nil, nil, terminals
+  end
+
+  -- Recover cleanly if the selected job exited or this module was reloaded.
+  local current = current_toggleterm and current_toggleterm()
+  for index, terminal in ipairs(terminals) do
+    if terminal == current then
+      set_selected(terminal.id)
+      return terminal, index, terminals
+    end
+  end
+
+  local terminal = terminals[#terminals]
+  set_selected(terminal.id)
+  return terminal, #terminals, terminals
+end
+
+local function is_open(terminal)
+  if terminal.window and not vim.api.nvim_win_is_valid(terminal.window) then
+    terminal.window = nil
+  end
+  return terminal:is_open()
+end
+
+local function setup_terminal_keymaps(terminal)
+  M.on_create_keymaps(terminal)
+end
+
+current_toggleterm = function()
+  for _, terminal in ipairs(toggleterm.get_all(true)) do
+    if is_open(terminal) and terminal:is_focused() then
+      return terminal
+    end
+  end
+end
 
 function M.default_keymaps()
   -- stylua: ignore start
@@ -24,12 +80,11 @@ function M.default_keymaps()
   vim.keymap.set("t", "<C-S-j>", M.toggle_horizontal, { desc = "Resize" })
   vim.keymap.set("t", "<C-S-h>", M.toggle_vertical, { desc = "Resize" })
 
-  vim.keymap.set("t", "<S-space>", "<space>") -- otherwise it prints ;2u, which i never need, even when i misclick
-  vim.keymap.set("t", "<S-backspace>", "<backspace>") -- prints 7;2u
+  vim.keymap.set("t", "<S-space>", "<space>")
+  vim.keymap.set("t", "<S-backspace>", "<backspace>")
 
-  -- activate tmux navigation in terminal mode
-  local map = function(key, cmd, nav)
-    vim.keymap.set({ "t" }, key, function()
+  local function map(key, cmd, nav)
+    vim.keymap.set("t", key, function()
       vim.cmd.stopinsert()
       vim.cmd(cmd)
     end, { desc = "TmuxNavigate " .. nav, noremap = true })
@@ -46,87 +101,103 @@ function M.on_create_keymaps(terminal)
   -- stylua: ignore start
   vim.keymap.set("t", "<esc><esc>", vim.cmd.stopinsert, { desc = "Stop insert mode", buffer = terminal.bufnr })
 
-  -- disable buffer cycling in terminal
-  vim.keymap.set({"n","i","v","x"}, "<A-tab>", "<A-tab>", {noremap = true, buffer = terminal.bufnr})
-  vim.keymap.set({"n","i","v","x"}, "<S-tab>", "<S-tab>", {noremap = true, buffer = terminal.bufnr})
+  -- Keep terminal buffers from interpreting these as buffer navigation.
+  vim.keymap.set({ "n", "i", "v", "x" }, "<A-tab>", "<A-tab>", { noremap = true, buffer = terminal.bufnr })
+  vim.keymap.set({ "n", "i", "v", "x" }, "<S-tab>", "<S-tab>", { noremap = true, buffer = terminal.bufnr })
   -- stylua: ignore end
 end
 
 function M.open_lazygit()
-  lazygit_terminal = Terminal:new({
-    cmd = "lazygit",
-  })
-  lazygit_terminal:open(nil, "float")
+  if vim.fn.executable("lazygit") ~= 1 then
+    vim.notify("lazygit is not available on PATH", vim.log.levels.WARN)
+    return
+  end
+
+  lazygit_terminal = lazygit_terminal
+    or Terminal:new({ cmd = "lazygit", direction = "float", hidden = true })
+
+  if is_open(lazygit_terminal) then
+    lazygit_terminal:close()
+  else
+    lazygit_terminal:open(nil, "float")
+  end
 end
 
 function M.close_lazygit()
-  if lazygit_terminal ~= nil then
-    lazygit_terminal:shutdown()
-    lazygit_terminal = nil
+  if lazygit_terminal and is_open(lazygit_terminal) then
+    lazygit_terminal:close()
   end
 end
 
-function M.print_active()
-  print("Terminal #" .. util.index_of(terminals, selected_terminal))
-end
+function M.upsert_terminal(id)
+  if not id then
+    return M.new()
+  end
 
-function M.on_create_terminal(terminal)
-  M.on_create_keymaps(terminal)
-  table.insert(terminals, terminal.id)
-  vim.api.nvim_create_autocmd("BufEnter", {
-    buffer = terminal.bufnr,
-    callback = function()
-      vim.cmd.startinsert()
-    end,
-  })
-  vim.api.nvim_create_autocmd("TermClose", {
-    once = true,
-    buffer = terminal.bufnr,
-    callback = function()
-      local current_index = util.index_of(terminals, terminal.id)
-      if selected_terminal == terminal.id then
-        local new_index = util.previous_index(current_index, #terminals)
-        selected_terminal = terminals[new_index]
-      end
-      table.remove(terminals, current_index)
-      print("Disposed terminal, " .. #terminals .. " still open.")
-    end,
-  })
-end
-
-function M.upsert_terminal(number)
-  local terminal = Terminal:new({ id = number })
-  if terminal:is_open() then
-    terminal:close()
+  local terminal = get_terminal(id)
+  if not terminal then
+    return M.new()
+  end
+  if is_open(terminal) then
+    if terminal:is_focused() then
+      terminal:close()
+    else
+      terminal:focus()
+    end
   else
     terminal:open(nil, remember_direction)
-    if not util.index_of(terminals, terminal.id) then
-      M.on_create_terminal(terminal)
-    end
-    selected_terminal = terminal.id
-    M.print_active()
+    setup_terminal_keymaps(terminal)
   end
+
+  set_selected(terminal.id)
   return terminal
 end
 
 function M.new()
-  vim.cmd.close()
-  local terminal_id = terminal_id_counter + 1
-  terminal_id_counter = terminal_id
-  M.upsert_terminal(terminal_id)
+  -- Hide a terminal only when it is the current window; never close an
+  -- unrelated editor split just to make room for a new terminal.
+  local current = current_toggleterm()
+  if current then
+    current:close()
+  end
+
+  -- Let toggleterm allocate IDs so custom terminals (such as lazygit) cannot
+  -- collide with a separate hand-maintained counter.
+  local terminal = Terminal:new()
+  terminal:open(nil, remember_direction)
+  setup_terminal_keymaps(terminal)
+  set_selected(terminal.id)
+  return terminal
 end
 
 function M.toggle()
-  M.upsert_terminal(selected_terminal)
+  local terminal = resolve_selected()
+  if not terminal then
+    return M.new()
+  end
+  return M.upsert_terminal(terminal.id)
 end
 
 function M.cycle(back)
-  if #terminals > 1 then
-    local find_index = back and util.previous_index or util.next_index
-    vim.cmd.close()
-    local current_index = util.index_of(terminals, selected_terminal)
-    selected_terminal = terminals[find_index(current_index, #terminals)]
-    M.toggle()
+  local current, current_index, terminals = resolve_selected()
+  if #terminals < 2 then
+    return
+  end
+
+  if current and is_open(current) then
+    current:close()
+  end
+
+  local next_index = back
+      and util.previous_index(current_index, #terminals)
+    or util.next_index(current_index, #terminals)
+  local next_terminal = terminals[next_index]
+  set_selected(next_terminal.id)
+  if is_open(next_terminal) then
+    next_terminal:focus()
+  else
+    next_terminal:open(nil, remember_direction)
+    setup_terminal_keymaps(next_terminal)
   end
 end
 
@@ -139,15 +210,19 @@ function M.cycle_back()
 end
 
 function M.resize(direction)
-  local terminal = Terminal:new({ id = selected_terminal })
-  local is_current_direction = direction == terminal.direction
-  vim.cmd.close()
-  if is_current_direction then
-    remember_direction = "float"
-  else
-    remember_direction = direction
+  local terminal = resolve_selected()
+  if not terminal then
+    return M.new()
   end
-  terminal:toggle(nil, remember_direction)
+
+  local same_direction = direction == terminal.direction
+  remember_direction = same_direction and "float" or direction
+
+  if is_open(terminal) then
+    terminal:close()
+  end
+  terminal:open(nil, remember_direction)
+  setup_terminal_keymaps(terminal)
 end
 
 function M.toggle_vertical()
