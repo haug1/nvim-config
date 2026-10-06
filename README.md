@@ -15,6 +15,13 @@ want Nix diagnostics and format-on-save for Nix files.
 Format-on-save runs configured Conform formatters only. Use `<leader>fb` for
 manual formatting with LSP fallback. Formatter errors appear as notifications.
 
+## Terminals
+
+`<C-t>` toggles the selected terminal, `<C-n>` creates a terminal, and
+`<C-.>` / `<C-,>` cycle through running terminals. These mappings close and
+reopen terminals through toggleterm's API so the terminal job stays attached to
+its terminal buffer. `<C-\>` toggles a reusable lazygit terminal.
+
 ## Fresh install
 
 Make sure `git`, `curl` or `wget`, `tar`, `unzip`, a C compiler, and the

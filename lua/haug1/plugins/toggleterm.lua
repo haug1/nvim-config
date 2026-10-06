@@ -5,10 +5,18 @@ return {
     opts = {
       persist_mode = false,
       start_in_insert = false,
-      on_open = function()
-        -- workaround: always insert mode when terminal opened
-        vim.fn.timer_start(1, function()
-          vim.cmd("startinsert!")
+      on_open = function(terminal)
+        -- Opening can be followed immediately by another keymap/window action.
+        -- Enter terminal mode only if this terminal is still the focused window.
+        vim.schedule(function()
+          if
+            terminal.window
+            and vim.api.nvim_win_is_valid(terminal.window)
+            and terminal:is_open()
+            and terminal:is_focused()
+          then
+            vim.cmd("startinsert!")
+          end
         end)
       end,
       size = function(term)
