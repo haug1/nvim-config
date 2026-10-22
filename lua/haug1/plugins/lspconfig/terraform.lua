@@ -17,12 +17,32 @@ return {
     end,
   },
   {
+    -- NOTE: installs a patched terraform-ls with much better performance
+    "haug1/terraform-ls",
+    branch = "fix/codelens-reference-count-perf",
+    lazy = true,
+    build = "go build -o bin/terraform-ls .",
+  },
+  {
     "neovim/nvim-lspconfig",
-    opts = {
-      servers = {
-        terraformls = {},
-      },
-    },
+    opts = function(_, opts)
+      local patched = vim.fn.stdpath("data")
+        .. "/lazy/terraform-ls/bin/terraform-ls"
+
+      local terraformls
+      if vim.fn.executable(patched) == 1 then
+        terraformls = { cmd = { patched, "serve" } }
+      else
+        terraformls = {
+          capabilities = {
+            experimental = { showReferencesCommandId = false },
+          },
+        }
+      end
+
+      opts.servers = opts.servers or {}
+      opts.servers.terraformls = terraformls
+    end,
   },
   {
     "mfussenegger/nvim-lint",
