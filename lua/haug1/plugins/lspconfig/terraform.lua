@@ -21,10 +21,7 @@ return {
     "haug1/terraform-ls",
     branch = "fix/codelens-reference-count-perf",
     lazy = true,
-    build = "{ [ -d internal/schemas/data/registry.terraform.io ]"
-      .. " || curl -fsSL https://github.com/haug1/terraform-ls/releases/download/provider-schemas/provider-schemas.tar.gz | tar -xz -C internal/schemas"
-      .. " || go generate ./internal/schemas; }"
-      .. " && go build -o bin/terraform-ls .",
+    build = "./build.sh",
   },
   {
     "neovim/nvim-lspconfig",
