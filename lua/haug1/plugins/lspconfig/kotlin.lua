@@ -25,11 +25,28 @@ return {
   },
   {
     "stevearc/conform.nvim",
-    opts = {
-      formatters_by_ft = {
-        kotlin = { "ktfmt" },
-      },
-    },
+    opts = function(_, opts)
+      local ktlint = require("haug1.config.ktlint")
+      local cmd, jvm_args = ktlint.command("format")
+
+      opts.formatters_by_ft = opts.formatters_by_ft or {}
+      opts.formatters_by_ft.kotlin = { "ktlint" }
+      opts.formatters = opts.formatters or {}
+      opts.formatters.ktlint = {
+        command = cmd,
+        -- Give ktlint the file path so it finds the project's .editorconfig (also path-scoped sections)
+        args = vim.list_extend(vim.deepcopy(jvm_args), {
+          "--format",
+          "--stdin",
+          "--log-level=none",
+          "--editorconfig=" .. ktlint.default_editorconfig,
+          "--stdin-path",
+          "$FILENAME",
+        }),
+        -- 1 = unfixable lint remains, but the formatted output is still valid
+        exit_codes = { 0, 1 },
+      }
+    end,
   },
   {
     "mfussenegger/nvim-lint",
