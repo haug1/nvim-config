@@ -13,6 +13,10 @@ return {
     config = function(_, opts)
       local is_nixos = require("haug1.core.util").is_nixos()
       require("mason").setup({
+        registries = {
+          "lua:haug1.mason-registry",
+          "github:mason-org/mason-registry",
+        },
         -- On NixOS, prefer tools supplied by the active system or dev shell.
         -- Mason's generic Linux binaries may depend on a loader unavailable there.
         PATH = is_nixos and "append" or "prepend",

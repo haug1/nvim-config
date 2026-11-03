@@ -12,8 +12,32 @@ not ask Mason to install `nil` or `alejandra`, since generic Linux Mason
 binaries may not run there. Add `nil` and `alejandra` to the environment if you
 want Nix diagnostics and format-on-save for Nix files.
 
-Format-on-save runs configured Conform formatters only. Use `<leader>fb` for
-manual formatting with LSP fallback. Formatter errors appear as notifications.
+Format-on-save uses the configured Conform formatters, including explicitly
+selected LSP formatters. Use `<leader>fb` for manual formatting with LSP fallback.
+Formatter errors appear as notifications.
+
+## Kotlin
+
+Kotlin uses `ktrs lsp` alongside `kotlin_lsp`: ktrs provides ktlint 1.8-compatible
+formatting and lint diagnostics, while Kotlin LSP provides language intelligence.
+Mason installs [ktrs](https://github.com/Hexay/ktrs/releases/tag/v0.5.3) at the
+pinned version 0.5.3 using the local registry in `lua/haug1/mason-registry/`.
+The package definition supports Linux and macOS on x86-64 and ARM64; Linux uses
+the static musl build, including on NixOS. No manual installation or Nix change
+is needed. The LSP uses Mason's binary directly, avoiding an unrelated version
+on `PATH`.
+
+On a fresh machine, let the automatic tool installation finish, then reopen
+Neovim. `:MasonToolsInstall` can also trigger installation; `:Mason` shows its
+status. To upgrade ktrs, update the version in both the local package definition
+and `kotlin.lua`, then run `:MasonToolsInstall`.
+
+Conform selects only ktrs for Kotlin formatting, including `<leader>fb` and
+format-on-save. `<leader>uf` still toggles automatic formatting. Diagnostics
+update through LSP, so no ktlint CLI, JVM worker, or prewarm hook is needed.
+Project `.editorconfig` files control style; without them, ktrs uses its standard
+defaults rather than the old personal two-space fallback. Use `:LspInfo` to check
+attachment and `<leader>lsr` to restart language servers.
 
 ## Terminals
 
